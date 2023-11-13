@@ -1,0 +1,21 @@
+alias functionNum R1;
+alias currentPID R2;
+if(R1==TERMINAL_WRITE) then
+	//calling acquire terminal
+	multipush(R1,R2);
+	R1 = ACQUIRE_TERMINAL;
+	R2 = currentPID;
+	call MOD_0;
+	multipop(R0,R1);
+	print(R3);
+	//calling release terminal
+	multipush(R1,R2);
+	R1 = RELEASE_TERMINAL;
+	R2 = currentPID;
+	call MOD_0;
+	// save return value in any other register if needed (R0)
+	multipop(R1,R2);
+	return;
+else
+	return;
+endif;

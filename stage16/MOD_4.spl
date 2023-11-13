@@ -1,0 +1,36 @@
+alias functionNum R1;
+alias currentPID R2;
+alias terminal_adress R3;
+if(R1==TERMINAL_WRITE) then
+	//calling acquire terminal
+	multipush(R1,R2);
+	R1 = ACQUIRE_TERMINAL;
+	R2 = currentPID;
+	call MOD_0;
+	multipop(R0,R1);
+	print(R3);
+	//calling release terminal
+	multipush(R1,R2);
+	R1 = RELEASE_TERMINAL;
+	R2 = currentPID;
+	call MOD_0;
+	// save return value in any other register if needed (R0)
+	multipop(R1,R2);
+	return;
+else   //otherwise its Terminal Read?	
+	//calling acquire terminal
+	multipush(R1,R2,R3);
+	R1 = ACQUIRE_TERMINAL;
+	R2 = currentPID;
+	call MOD_0;
+	multipop(R1,R2,R3);
+	breakpoint;
+	read;
+	breakpoint;
+	[PROCESS_TABLE + (currentPID)*16 + 4] = WAIT_TERMINAL;
+	multipush(R1,R2,R3);
+	call MOD_5;   //scheduler
+	multipop(R1,R2,R3);
+	[[PTBR+(R3/512)*2]*512 + R3%512] = [PROCESS_TABLE + currentPID*16 + 8];  //Storing word from input buffer field
+	return;
+endif;

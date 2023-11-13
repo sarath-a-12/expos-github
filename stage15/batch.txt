@@ -1,0 +1,13 @@
+fdisk
+load --os ../stage15/os_startup.xsm
+load --int=timer ../stage15/Timer_Interrupt.xsm
+load --idle ../stage15/idle.xsm
+load --init ../stage15/oddno.xsm
+load --exec ../stage15/evenno.xsm
+load --module 7 ../stage15/MOD_7.xsm
+load --module 5 ../stage15/MOD_5.xsm
+load --module 4 ../stage15/MOD_4.xsm
+load --module 0 ../stage15/MOD_0.xsm
+load --int=10 ../stage15/INT_10.xsm
+load --library ../expl/library.lib
+load --int=7 ../stage15/INT_7.xsm

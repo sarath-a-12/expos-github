@@ -1,0 +1,14 @@
+fdisk
+load --os ../stage16/os_startup.xsm
+load --int=timer ../stage16/Timer_Interrupt.xsm
+load --idle ../stage16/idle.xsm
+load --init ../stage16/bubble_sort.xsm
+load --module 7 ../stage16/MOD_7.xsm
+load --module 5 ../stage16/MOD_5.xsm
+load --module 4 ../stage16/MOD_4.xsm
+load --module 0 ../stage16/MOD_0.xsm
+load --int=10 ../stage16/INT_10.xsm
+load --library ../expl/library.lib
+load --int=7 ../stage16/INT_7.xsm
+load --int=6 ../stage16/INT_6.xsm
+load --int=console ../stage16/Console_Interrupt.xsm

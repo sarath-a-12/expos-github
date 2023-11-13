@@ -1,0 +1,51 @@
+alias userSP R0;
+userSP = SP;
+ 
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 13] = userSP;
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 11] * 512 - 1;
+
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9]  = 9; //mode is set to 9
+alias fileName R1;
+fileName = [[PTBR + (userSP/512)*2]*512 + (userSP%512)];
+alias inodeTracker R2;
+inodeTracker = 0;
+alias flag R3;
+flag = 0;
+while(inodeTracker<60) do //60 is MAX_FILE_NUM
+	if([INODE_TABLE + 16*inodeTracker + 1]==fileName && [INODE_TABLE + 16*inodeTracker] == EXEC) then
+		flag = 1;
+		break;
+	endif;
+	inodeTracker = inodeTracker + 1;
+endwhile;
+if(flag==0) then
+	[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9]  = 0; //mode is set to 0 for resuming user process
+	[[PTBR+((userSP-1)/512)*2]*512 + (userSP-1)%512] = -1; //return value -1 for failure
+	SP = userSP;	
+	ireturn;
+endif;
+//Do not use inodeTracker/R2 for anything else
+//Exit process function call
+multipush(R0,R1,R2,R3);
+R1 = 3;
+call MOD_1;
+multipop(R0,R1,R2,R3);
+alias userAreaPage R3;
+userAreaPage = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11];
+[MEMORY_FREE_LIST + userAreaPage] = [MEMORY_FREE_LIST + userAreaPage] + 1;
+[SYSTEM_STATUS_TABLE + 2] =[SYSTEM_STATUS_TABLE + 2] - 1; //decrementing MEM_FREE_COUNT
+SP = userAreaPage*512-1; //initializing stack of the new process
+
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 4] = RUNNING;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 7] = inodeTracker;
+
+//no-need to allocate library pages for new process because we did not deallocate them?
+//get free page function
+multipush(R0,R1,R2,R3);
+R1 = 1;
+call MOD_2; //this should allocate two stack and two heap pages
+multipop(R0,R1,R2,R3);
+//validate corresponding entries in page table??
+
+
+
